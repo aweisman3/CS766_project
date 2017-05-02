@@ -2,7 +2,7 @@
 % This code is the main code for locating and segmenting the liver 
 %
 %
-addp
+addpath('SIFT_matlab')
 %% Run SVM model on given dataset
 characteristics = load('Data\training_data_7neighbs_3slices_PETres');
 X = characteristics.characteristics;
@@ -100,7 +100,16 @@ for pat = 4:5
         mid_r = median(r); 
         side_c = quantile(c, 0.75);
         
-        liver_sphere = 
+        diam_cm = 3;
+        voxelsizes = ct.voxel_size;
+        xy_size = voxelsizes(1);
+        z_size = voxelsizes(3);
+        xy_diam = diam_cm/xy_size;
+        z_diam = diam_cm/z_size;
+        
+        
+        [rr cc zz] = meshgrid(1:size(CTdata,1), 1:size(CTdata,2), 1:size(CTdata,3));
+        S = sqrt(rr-
     
     
     else 

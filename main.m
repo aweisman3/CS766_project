@@ -100,8 +100,17 @@ for pat = 4:5
         mid_r = median(r); 
         side_c = quantile(c, 0.75);
         
-        liver_sphere = 
-    
+        diam_cm = 3;
+        voxelsizes = ct.voxel_size;
+        xy_size = voxelsizes(1);
+        z_size = voxelsizes(3);
+        xy_rad = (diam_cm/xy_size)/2;
+        z_rad = (diam_cm/z_size)/2;
+        
+        
+        [rr cc zz] = meshgrid(1:size(CTdata,1), 1:size(CTdata,2), 1:size(CTdata,3));
+        S = sqrt( ((rr-mid_r).^2 + (cc-side_c).^2)./(xy_rad^2) + ((zz-mid_s).^2./(z_rad^2)));
+        
     
     else 
         msg = 'Point is not located in the liver';
