@@ -13,3 +13,8 @@ loadAmOrNrrd (this calls the nrrdread function and loads in a more digestible fo
 FindLiver (this generates points of interest and runs them through the SVM model)
 and
 liverSegment (this segments the liver using a region growing algorithm)
+
+
+THE DATA
+Two example patients, as well as the training data for the SVM model, can be downloaded at the following link:
+https://uwmadison.box.com/s/1zpsux7we41zjfvhmffmcv02lrfl1sy5
