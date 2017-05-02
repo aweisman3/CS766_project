@@ -4,7 +4,8 @@
 %
 addpath('SIFT_matlab')
 %% Run SVM model on given dataset
-characteristics = load('Data\training_data_7neighbs_3slices_PETres');
+mydir = 'C:\Users\aweisman\Box Sync\Amy_Documents\2ndYear_Courses\CS766\Data\';
+characteristics = load([mydir, '\training_data_7neighbs_3slices_PETres']);
 X = characteristics.characteristics;
 training = X(:, 1:10);
 group = X(:,11);
@@ -16,7 +17,8 @@ CVSVMModel = crossval(SVMModel);
 kfoldLoss(CVSVMModel)
 
 %%
-%list of train patients and test patients
+%list of train patients and test patients, only DK5 and DK6 used for
+%example patients
 trainpatients = {'DK1', 'DK2','DK3','DK4','DK8', 'DLBCL1','DLBCL2','DLBCL4','DLBCL5','MSSM_NHL1'};
 testpatients = {'MSSM4', 'MSSM9', 'MSSM14', 'DK5', 'DK6', 'DK7', 'DLBCL3', 'MSSM_NHL3', 'MSSM1', 'MSSM2'};
 
@@ -32,7 +34,6 @@ pt_inliver = zeros([size(testpatients,2),1]);
 for pat = 4:5
     
     %Load ct, pet, and liver mask (for testing accuracy)
-    mydir = '\Data\';
     ct = loadAmOrNrrd([mydir, testpatients{pat}, '_ct.nrrd']);
     pet = loadAmOrNrrd([mydir, testpatients{pat}, '_pet.nrrd']);
     liver = loadAmOrNrrd([mydir, testpatients{pat}, '_liverMask.nrrd']);
@@ -95,7 +96,8 @@ for pat = 4:5
         nrrdWriter([mydir, testpatients{pat}, '_liverSegmented.nrrd'], newMask, pet.voxel_size, ct.start, 'raw');
     
         %Generate liver sphere and calculate mean in liver
-        [r,c,s] = find(newMask==1);
+        ind = find(newMask == 1);
+        [r,c,s] = ind2sub(size(newMask), ind);
         mid_s = median(s);
         mid_r = median(r); 
         side_c = quantile(c, 0.75);
@@ -104,14 +106,21 @@ for pat = 4:5
         voxelsizes = ct.voxel_size;
         xy_size = voxelsizes(1);
         z_size = voxelsizes(3);
-        xy_diam = diam_cm/xy_size;
-        z_diam = diam_cm/z_size;
+        xy_rad = (diam_cm/xy_size)/2;
+        z_rad = (diam_cm/z_size)/2;
         
         
-        [rr cc zz] = meshgrid(1:size(CTdata,1), 1:size(CTdata,2), 1:size(CTdata,3));
-        S = sqrt(rr-
-    
-    
+        [rr, cc, zz] = meshgrid(1:size(CTdata,1), 1:size(CTdata,2), 1:size(CTdata,3));
+        S = sqrt( ((rr-side_c).^2 + (cc-mid_r).^2)./(xy_rad^2) + ((zz-mid_s).^2./(z_rad^2)))<=1;
+        ind_sphere = find(S>0);
+        
+       
+        liver_sphere = zeros(size(CTdata));
+        liver_sphere(ind_sphere)=1;
+        nrrdWriter([mydir, testpatients{pat}, '_liverSphere.nrrd'], liver_sphere, pet.voxel_size, ct.start, 'raw');
+        
+        liverMean = mean(PETdata(ind_spher
+ 
     else 
         msg = 'Point is not located in the liver';
         error(msg);
