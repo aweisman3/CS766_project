@@ -77,10 +77,4 @@ nonliverCoords(:,1) = nonliverCoords(:,1) + min(ys);
 nonliverCoords(:,2) = nonliverCoords(:,2) + min(xs);
 nonliverCoords(:,3) = nonliverCoords(:,3) + min(zs1);
 
-% Plot the results
-fg = figure();
-sliceOI = round(mean(liverCoords(:,1)));
-imshow(squeeze(CTdata(sliceOI + min(zs1), :, :)), [0,200]);
-hold on
-plot(liverCoords(:,3), liverCoords(:,2), 'g.', 'MarkerSize', 10);
-plot(nonliverCoords(:,3), nonliverCoords(:,2), 'r.', 'MarkerSize', 10);
+

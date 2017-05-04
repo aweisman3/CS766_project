@@ -8,7 +8,8 @@
 function mask = liverSegment(CTdata, PETdata, row_coord, col_coord, z_coord)
 
 % Set threshold parameters
-CTgradThresh = 0.015; 
+xyCTgradThresh = 0.015; 
+zCTgradThresh = 0.013; 
 
 % preallocate array
 mask = zeros(size(CTdata));
@@ -63,14 +64,14 @@ while size(guesses, 1)
     for yy = -1:1
       for zz = -1:1
             
-        if xnew+xx > 0  &&  xnew+xx <= nRow &&...          % within the x-bounds?
-           ynew+yy > 0  &&  ynew+yy <= nCol &&...          % within the y-bounds?          
-           znew+zz > 0  &&  znew+zz <= nSli &&...          % within the z-bounds?
+        if xnew+xx > 0  &&  xnew+xx <= nRow &&...          % within x dim?
+           ynew+yy > 0  &&  ynew+yy <= nCol &&...          % within y dim?     
+           znew+zz > 0  &&  znew+zz <= nSli &&...          % within z dim?
            any([xx, yy, zz])       &&...      % i/j/k of (0/0/0) is redundant
            ~mask(xnew+xx, ynew+yy, znew+zz) &&...          % pixelposition already set?
-           CTxgradient_img(xnew+xx, ynew+yy, znew+zz) < CTgradThresh && ... 
-           CTygradient_img(xnew+xx, ynew+yy, znew+zz) < CTgradThresh && ...
-           CTzgradient_img(xnew+xx, ynew+yy, znew+zz) < CTgradThresh && ...
+           CTxgradient_img(xnew+xx, ynew+yy, znew+zz) < xyCTgradThresh && ... 
+           CTygradient_img(xnew+xx, ynew+yy, znew+zz) < xyCTgradThresh && ...
+           CTzgradient_img(xnew+xx, ynew+yy, znew+zz) < zCTgradThresh && ...
            CTdata(xnew+xx, ynew+yy, znew+zz) < 2.5*CTmax && ... 
            CTdata(xnew+xx, ynew+yy, znew+zz) > fac*CTmin && ...
            PETdata(xnew+xx, ynew+yy, znew+zz) < 2.5*PETmax && ...
@@ -101,8 +102,8 @@ for slice = 1:size(CTdata,3)
 end
 
 % find liver component if there were broken pieces
-maskLabelled = bwlabeln(mask);
-liverLabel = maskLabelled(row_coord, col_coord, z_coord);
+maskLabelled = bwlabeln(mask, 6);
+liverLabel = maskLabelled(row_coord, col_coord, z_coord-5);
 ind = maskLabelled == liverLabel;
 finalMask = zeros(size(mask));
 finalMask(ind) = 1;

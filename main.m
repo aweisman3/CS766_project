@@ -3,8 +3,9 @@
 %
 %
 addpath('SIFT_matlab')
-%% Run SVM model on given dataset
 mydir = 'C:\Users\aweisman\Box Sync\Amy_Documents\2ndYear_Courses\CS766\Data\';
+
+%% Run SVM model on given dataset
 characteristics = load([mydir, '\training_data_7neighbs_3slices_PETres']);
 X = characteristics.characteristics;
 training = X(:, 1:10);
@@ -17,9 +18,7 @@ CVSVMModel = crossval(SVMModel);
 kfoldLoss(CVSVMModel)
 
 %%
-%list of train patients and test patients, only DK5 and DK6 used for
-%example patients
-trainpatients = {'DK1', 'DK2','DK3','DK4','DK8', 'DLBCL1','DLBCL2','DLBCL4','DLBCL5','MSSM_NHL1'};
+%list of train patients and test patients, only DK5 and DK6 used for example patients
 testpatients = {'MSSM4', 'MSSM9', 'MSSM14', 'DK5', 'DK6', 'DK7', 'DLBCL3', 'MSSM_NHL3', 'MSSM1', 'MSSM2'};
 
 %If you're interested in calculating sensitivity/specificity/positive
@@ -52,6 +51,15 @@ for pat = 4:5
     
     % Run code to find the liver and non liver points of interest
     [liverCoords, nonliverCoords] = FindLiver(PETdata,CTdata, SVMModel);
+   
+    % Plot the results
+    sliceOI = round(mean(liverCoords(:,1)));
+    imshow(squeeze(CTdata(sliceOI, :, :)), [0,200]);
+    hold on
+    plot(liverCoords(:,3), liverCoords(:,2), 'g.', 'MarkerSize', 5);
+    plot(nonliverCoords(:,3), nonliverCoords(:,2), 'r.', 'MarkerSize', 5);
+    saveas(gcf, [mydir, testpatients{pat}, '_locateliver_result.png']);
+    clf 
     
     %Calculate sens, spec, ppv, and npv
     allpts = size(liverCoords,1) + size(nonliverCoords,1);
